@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <libssh/libssh.h>
+
+int main() {
+    ssh_session session;
+    ssh_scp scp;
+    int rc;
+
+    // Initialize libssh
+    ssh_init();
+
+    // Connect to remote host
+    session = ssh_new();
+    if (session == NULL) {
+        printf("Error: Could not establish SSH session\n");
+        exit(1);
+    }
+    ssh_options_set(session, SSH_OPTIONS_HOST, "remotehost");
+    ssh_options_set(session, SSH_OPTIONS_USER, "remoteusername");
+    rc = ssh_connect(session);
+    if (rc != SSH_OK) {
+        printf("Error: Could not connect to remote host: %s\n", ssh_get_error(session));
+        ssh_free(session);
+        exit(1);
+    }
+
+    // Authenticate with remote host
+    rc = ssh_userauth_password(session, NULL, "remotepassword");
+    if (rc != SSH_AUTH_SUCCESS) {
+        printf("Error: Could not authenticate with remote host: %s\n", ssh_get_error(session));
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+
+    // Start SCP session
+    scp = ssh_scp_new(session, SSH_SCP_WRITE, "/remote/path/to/copy");
+    if (scp == NULL) {
+        printf("Error: Could not establish SCP session\n");
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+    rc = ssh_scp_init(scp);
+    if (rc != SSH_OK) {
+        printf("Error: Could not initialize SCP session: %s\n", ssh_get_error(session));
+        ssh_scp_free(scp);
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+
+    // Copy file
+    FILE* file = fopen("localfile", "rb");
+    if (file == NULL) {
+        printf("Error: Could not open local file\n");
+        ssh_scp_close(scp);
+        ssh_scp_free(scp);
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+    rc = ssh_scp_push_file(scp, "filename", filesize, S_IRUSR | S_IWUSR);
+    if (rc != SSH_OK) {
+        printf("Error: Could not push file to remote host: %s\n", ssh_get_error(session));
+        fclose(file);
+        ssh_scp_close(scp);
+        ssh_scp_free(scp);
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+    rc = ssh_scp_write(scp, file, filesize);
+    if (rc != SSH_OK) {
+        printf("Error: Could not write file to remote host: %s\n", ssh_get_error(session));
+        fclose(file);
+        ssh_scp_close(scp);
+        ssh_scp_free(scp);
+        ssh_disconnect(session);
+        ssh_free(session);
+        exit(1);
+    }
+    fclose(file);
+
+    // Cleanup
+    ssh_scp_close(scp);
+    ssh_scp_free(scp);
+    ssh_disconnect(session);
+    ssh_free(session);
+    ssh_finalize();
+
+    return 0;
+}
+
+This example assumes that you have installed and linked against the libssh library and have replaced the placeholder values for the remote host, username, password, local file, filename, filesize, and remote path. You can customize this code to fit your specific use case.
