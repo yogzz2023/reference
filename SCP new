@@ -1,0 +1,385 @@
+#include <libssh/libssh.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    ssh_session my_ssh_session;
+    int rc;
+    char *host = "example.com";
+    char *username = "user";
+    char *password = "password";
+    char *local_file = "/path/to/local/file";
+    char *remote_file = "/path/to/remote/file";
+
+    // Connect to the remote host
+    my_ssh_session = ssh_new();
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, host);
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_USER, username);
+
+    // Set the path to the private key if you are using key-based authentication
+    // ssh_options_set(my_ssh_session, SSH_OPTIONS_IDENTITY, "/path/to/private/key");
+
+    rc = ssh_connect(my_ssh_session);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error connecting to remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Authenticate with the remote host
+    rc = ssh_userauth_password(my_ssh_session, NULL, password);
+    if (rc != SSH_AUTH_SUCCESS)
+    {
+        fprintf(stderr, "Error authenticating with remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Transfer the file using SCP
+    rc = scp_put(my_ssh_session, local_file, remote_file, S_IRUSR | S_IWUSR);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error transferring file: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Disconnect from the remote host
+    ssh_disconnect(my_ssh_session);
+    ssh_free(my_ssh_session);
+
+    return 0;
+}
+In this example, the SSH_OPTIONS_HOST option is used to specify the hostname or IP address of the remote system. If you are using key-based authentication, you can also set the path to the private key using the SSH_OPTIONS_IDENTITY option.
+
+Make sure that the remote system has an SSH server running and that the user account you are authenticating with has the necessary permissions to write to the remote file. You may also need to configure firewall rules or network settings to allow the SSH connection to the remote system.
+
+File Transfer with SCP.
+
+
+P M YOGESH
+SCP api function for file transfer from one system to another in c
+
+There is no specific SCP API function available in C, but you can use the SCP protocol to transfer files from one system to another in C. SCP is a protocol that uses SSH (Secure Shell) to securely transfer files between hosts.
+
+To use SCP in C, you can use the libssh library, which provides an API for SSH protocol implementation. Here's an example code snippet to transfer a file using SCP:
+
+scss
+Copy code
+#include <libssh/libssh.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    ssh_session my_ssh_session;
+    int rc;
+    char *host = "example.com";
+    char *username = "user";
+    char *password = "password";
+    char *local_file = "/path/to/local/file";
+    char *remote_file = "/path/to/remote/file";
+
+    // Connect to the remote host
+    my_ssh_session = ssh_new();
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, host);
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_USER, username);
+    rc = ssh_connect(my_ssh_session);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error connecting to remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Authenticate with the remote host
+    rc = ssh_userauth_password(my_ssh_session, NULL, password);
+    if (rc != SSH_AUTH_SUCCESS)
+    {
+        fprintf(stderr, "Error authenticating with remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Transfer the file using SCP
+    rc = scp_put(my_ssh_session, local_file, remote_file, S_IRUSR | S_IWUSR);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error transferring file: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Disconnect from the remote host
+    ssh_disconnect(my_ssh_session);
+    ssh_free(my_ssh_session);
+
+    return 0;
+}
+In this example, the ssh_new() function is used to create a new SSH session, and ssh_connect() is used to connect to the remote host. ssh_userauth_password() is used to authenticate with the remote host using a password.
+
+The scp_put() function is used to transfer the file. It takes the SSH session, the local file path, the remote file path, and the permissions for the remote file as arguments.
+
+Finally, ssh_disconnect() and ssh_free() are used to disconnect from the remote host and free the SSH session.
+
+
+
+
+P M YOGESH
+Give a sample local file and remote file 
+
+Sure, here is an example of a local file and remote file that you can use for testing purposes.
+
+Local file:
+
+bash
+Copy code
+/home/user/Documents/localfile.txt
+Remote file:
+
+bash
+Copy code
+/home/remoteuser/remote_file.txt
+You can modify the file paths in the example code snippet I provided earlier to match these paths. Make sure that the local file exists and that the remote user has the necessary permissions to write to the remote file.
+
+
+
+
+P M YOGESH
+If the remote file is in different system
+
+If the remote file is on a different system, you need to specify the IP address or hostname of the remote system in the SSH connection options. Here's an updated code snippet that demonstrates how to transfer a file from a local system to a remote system using SCP in C:
+
+scss
+Copy code
+#include <libssh/libssh.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    ssh_session my_ssh_session;
+    int rc;
+    char *host = "example.com";
+    char *username = "user";
+    char *password = "password";
+    char *local_file = "/path/to/local/file";
+    char *remote_file = "/path/to/remote/file";
+
+    // Connect to the remote host
+    my_ssh_session = ssh_new();
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, host);
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_USER, username);
+
+    // Set the path to the private key if you are using key-based authentication
+    // ssh_options_set(my_ssh_session, SSH_OPTIONS_IDENTITY, "/path/to/private/key");
+
+    rc = ssh_connect(my_ssh_session);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error connecting to remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Authenticate with the remote host
+    rc = ssh_userauth_password(my_ssh_session, NULL, password);
+    if (rc != SSH_AUTH_SUCCESS)
+    {
+        fprintf(stderr, "Error authenticating with remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Transfer the file using SCP
+    rc = scp_put(my_ssh_session, local_file, remote_file, S_IRUSR | S_IWUSR);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error transferring file: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        return 1;
+    }
+
+    // Disconnect from the remote host
+    ssh_disconnect(my_ssh_session);
+    ssh_free(my_ssh_session);
+
+    return 0;
+}
+In this example, the SSH_OPTIONS_HOST option is used to specify the hostname or IP address of the remote system. If you are using key-based authentication, you can also set the path to the private key using the SSH_OPTIONS_IDENTITY option.
+
+Make sure that the remote system has an SSH server running and that the user account you are authenticating with has the necessary permissions to write to the remote file. You may also need to configure firewall rules or network settings to allow the SSH connection to the remote system.
+
+
+
+
+P M YOGESH
+Give me code for ssh server
+
+Setting up an SSH server involves installing an SSH daemon software and configuring it properly. The specific steps to do this can vary depending on the operating system you are using. Here's an example of how to set up an SSH server on Ubuntu Linux:
+
+Install the SSH daemon software:
+
+csharp
+Copy code
+sudo apt-get install openssh-server
+By default, the SSH daemon should start automatically when the system boots up. You can also start it manually using the following command:
+
+sql
+Copy code
+sudo service ssh start
+You may want to configure the SSH server to use key-based authentication instead of password authentication. To do this, create an SSH key pair on your local system:
+
+Copy code
+ssh-keygen
+Copy the public key to the remote system:
+
+sql
+Copy code
+ssh-copy-id user@remote-host
+This will add your public key to the authorized_keys file in the ~/.ssh directory of the remote user's home directory.
+
+With the SSH daemon installed and configured, you can now connect to the remote system using an SSH client such as ssh or PuTTY.
+
+Here is a sample code that can be used to create a simple SSH server using libssh in C. This is just an example to show how to create an SSH server, and it is not recommended to use this code in a production environment without proper security measures.
+
+#include <libssh/libssh.h>
+#include <stdio.h>
+
+int main()
+{
+    ssh_bind sshbind;
+    ssh_session session;
+    int port = 22;
+    int rc;
+
+    // Create an SSH bind object
+    sshbind = ssh_bind_new();
+    if (sshbind == NULL)
+    {
+        fprintf(stderr, "Error creating SSH bind object\n");
+        return 1;
+    }
+
+    // Set the port to listen on
+    rc = ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_PORT_STR, "22");
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error setting SSH bind option: %s\n", ssh_get_error(sshbind));
+        ssh_bind_free(sshbind);
+        return 1;
+    }
+
+    // Bind to the port and start listening for connections
+    rc = ssh_bind_listen(sshbind);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error binding to SSH port: %s\n", ssh_get_error(sshbind));
+        ssh_bind_free(sshbind);
+        return 1;
+    }
+
+    // Accept a new SSH connection
+    session = ssh_new();
+    if (session == NULL)
+    {
+        fprintf(stderr, "Error creating SSH session\n");
+        ssh_bind_free(sshbind);
+        return 1;
+    }
+
+    rc = ssh_bind_accept(sshbind, session);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error accepting SSH connection: %s\n", ssh_get_error(sshbind));
+        ssh_disconnect(session);
+        ssh_free(session);
+        ssh_bind_free(sshbind);
+        return 1;
+    }
+
+    printf("SSH connection established\n");
+
+    // Authenticate the user
+    rc = ssh_userauth_none(session, NULL);
+    if (rc != SSH_AUTH_SUCCESS)
+    {
+        fprintf(stderr, "Error authenticating user: %s\n", ssh_get_error(session));
+        ssh_disconnect(session);
+        ssh_free(session);
+        ssh_bind_free(sshbind);
+        return 1;
+    }
+
+    printf("User authenticated\n");
+
+    // Execute a command on the remote system
+    ssh_channel channel;
+    channel = ssh_channel_new(session);
+    if (channel == NULL)
+    {
+        fprintf(stderr, "Error creating SSH
+
+channel: %s\n", ssh_get_error(session));
+ssh_disconnect(session);
+ssh_free(session);
+ssh_bind_free(sshbind);
+return 1;
+}rc = ssh_channel_open_session(channel);
+if (rc != SSH_OK)
+{
+    fprintf(stderr, "Error opening SSH channel: %s\n", ssh_get_error(session));
+    ssh_channel_free(channel);
+    ssh_disconnect(session);
+    ssh_free(session);
+    ssh_bind_free(sshbind);
+    return 1;
+}
+
+rc = ssh_channel_request_exec(channel, "ls -l");
+if (rc != SSH_OK)
+{
+    fprintf(stderr, "Error executing command: %s\n", ssh_get_error(session));
+    ssh_channel_free(channel);
+    ssh_disconnect(session);
+    ssh_free(session);
+    ssh_bind_free(sshbind);
+    return 1;
+}
+
+char buffer[256];
+int nbytes;
+
+while ((nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0)) > 0)
+{
+    fwrite(buffer, 1, nbytes, stdout);
+}
+
+if (nbytes < 0)
+{
+    fprintf(stderr, "Error reading SSH channel: %s\n", ssh_get_error(session));
+    ssh_channel_free(channel);
+    ssh_disconnect(session);
+    ssh_free(session);
+    ssh_bind_free(sshbind);
+    return 1;
+}
+
+ssh_channel_send_eof(channel);
+ssh_channel_free(channel);
+ssh_disconnect(session);
+ssh_free(session);
+ssh_bind_free(sshbind);
+
+return 0;
+
+
+This code creates an SSH server that listens on port 22 and accepts connections from SSH clients. When a client connects and authenticates successfully, the server executes the `ls -l` command on the remote system and prints the output to the console. Again, this is just a simple example and does not provide any security measures such as encryption or authentication.
+
+
+
