@@ -1,0 +1,77 @@
+#include <libssh/libssh.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv)
+{
+    ssh_session my_ssh_session;
+    int rc;
+    char *password;
+    char *remote_file_path;
+    char *local_file_path;
+    ssh_scp scp;
+    int mode = O_WRONLY | O_CREAT | O_TRUNC;
+    mode_t file_mode = 0644;
+    
+    // Initialize the SSH session
+    my_ssh_session = ssh_new();
+    if (my_ssh_session == NULL)
+        exit(-1);
+    
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, "remote_host");
+    ssh_options_set(my_ssh_session, SSH_OPTIONS_USER, "remote_username");
+    
+    // Connect to the remote host
+    rc = ssh_connect(my_ssh_session);
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error connecting to remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_free(my_ssh_session);
+        exit(-1);
+    }
+    
+    // Authenticate with the remote host
+    password = getpass("Password: ");
+    rc = ssh_userauth_password(my_ssh_session, NULL, password);
+    if (rc != SSH_AUTH_SUCCESS)
+    {
+        fprintf(stderr, "Error authenticating with remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        exit(-1);
+    }
+    
+    // Initialize the SCP session
+    remote_file_path = "/path/to/remote/file";
+    local_file_path = "/path/to/local/file";
+    scp = ssh_scp_new(my_ssh_session, mode, remote_file_path);
+    if (scp == NULL)
+    {
+        fprintf(stderr, "Error initializing SCP session: %s\n", ssh_get_error(my_ssh_session));
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        exit(-1);
+    }
+    
+    // Copy the file to the remote host
+    rc = ssh_scp_push_file(scp, local_file_path, file_mode, ssh_get_fd(my_ssh_session));
+    if (rc != SSH_OK)
+    {
+        fprintf(stderr, "Error copying file to remote host: %s\n", ssh_get_error(my_ssh_session));
+        ssh_scp_close(scp);
+        ssh_scp_free(scp);
+        ssh_disconnect(my_ssh_session);
+        ssh_free(my_ssh_session);
+        exit(-1);
+    }
+    
+    // Cleanup and disconnect from the remote host
+    ssh_scp_close(scp);
+    ssh_scp_free(scp);
+    ssh_disconnect(my_ssh_session);
+    ssh_free(my_ssh_session);
+    
+    return 0;
+}
+
+
