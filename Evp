@@ -1,0 +1,299 @@
+Linking -lcrypto and -lssh
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP
+
+To link against the OpenSSL libcrypto and the libssh library, you need to add the -lcrypto and -lssh linker flags respectively to your compile command. For example:
+
+
+gcc -o my_program my_program.c -lcrypto -lssh
+If you're still getting an "undefined reference" error to the EVP functions, it's possible that you're not including the necessary header files or you're not linking against the correct version of the library.
+
+Make sure that you have included the appropriate header files using the #include directive at the top of your source code file.
+#include <openssl/evp.h>
+Also, ensure that you are linking against the correct version of the OpenSSL library and that the library is installed on your system. If you have installed OpenSSL from source, make sure that you have run the make install command to install the library and header files.
+
+If you are still having trouble, you can try adding the -L flag followed by the path to the directory where the OpenSSL and libssh libraries are located, as well as the -I flag followed by the path to the directory where the OpenSSL and libssh header files are located. For example:
+
+gcc -o my_program my_program.c -L/usr/local/lib -I/usr/local/include -lcrypto -lssh
+Replace /usr/local/lib and /usr/local/include with the actual paths to the directories where the libraries and header files are installed on your system.
+
+
+========{============
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP
+
+To link against the -lcrypto and -lssh libraries and resolve undefined references to EVP, you need to ensure that your build system or compiler is configured to link against these libraries.
+
+Here's an example command-line invocation of the GCC compiler that links against both -lcrypto and -lssh:
+
+
+gcc myprogram.c -o myprogram -lcrypto -lssh
+Note that the order of the library flags is important. Libraries should be listed in the order they depend on each other, i.e., if libA depends on libB, then libB should be listed before libA.
+
+If you're using a build system like Make or CMake, you'll need to modify your build configuration to link against these libraries. In a Makefile, you might have something like:
+
+
+myprogram: myprogram.o
+    gcc myprogram.o -o myprogram -lcrypto -lssh
+In a CMakeLists.txt file, you might have something like:
+
+
+add_executable(myprogram myprogram.c)
+target_link_libraries(myprogram crypto ssh)
+Note that the actual names of the libraries may differ depending on your platform and distribution. You can use the pkg-config utility to find the correct names on your system. For example, you might use pkg-config like this:
+
+
+gcc myprogram.c -o myprogram `pkg-config --libs openssl libssh`
+This will automatically generate the correct -lcrypto and -lssh flags based on the output of pkg-config.
+
+
+========
+
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP
+
+To link against the -lcrypto and -lssh libraries and resolve undefined references to EVP, you need to ensure that your build system or compiler is configured to link against these libraries.
+
+Here's an example command-line invocation of the GCC compiler that links against both -lcrypto and -lssh:
+
+
+gcc myprogram.c -o myprogram -lcrypto -lssh
+Note that the order of the library flags is important. Libraries should be listed in the order they depend on each other, i.e., if libA depends on libB, then libB should be listed before libA.
+
+If you're using a build system like Make or CMake, you'll need to modify your build configuration to link against these libraries. In a Makefile, you might have something like:
+
+
+myprogram: myprogram.o
+    gcc myprogram.o -o myprogram -lcrypto -lssh
+In a CMakeLists.txt file, you might have something like:
+
+
+add_executable(myprogram myprogram.c)
+target_link_libraries(myprogram crypto ssh)
+Note that the actual names of the libraries may differ depending on your platform and distribution. You can use the pkg-config utility to find the correct names on your system. For example, you might use pkg-config like this:
+
+
+gcc myprogram.c -o myprogram `pkg-config --libs openssl libssh`
+This will automatically generate the correct -lcrypto and -lssh flags based on the output of pkg-config.
+
+
+
+
+
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP_ctx in libssh.so
+
+If you're getting an undefined reference to EVP_CTX when linking against libssh.so, it's possible that the version of OpenSSL that you're using is not compatible with the version of libssh.so that you have installed.
+
+Here are some steps you can take to troubleshoot the issue:
+
+Check the version of OpenSSL you're using. You can do this by running the command openssl version. Make sure that the version of OpenSSL you're using is compatible with the version of libssh.so you have installed.
+
+Check the linker flags you're using to link against OpenSSL and libssh.so. Make sure that you're including the correct paths to the library files and using the correct library names. You can check the output of pkg-config to see the correct linker flags. For example:
+
+gcc myprogram.c -o myprogram `pkg-config --cflags --libs openssl libssh`
+This will include the correct paths and library names for OpenSSL and libssh.so.
+
+Check if there are any missing dependencies for libssh.so. You can use the ldd command to check the library dependencies of libssh.so. For example:
+
+ldd /path/to/libssh.so
+Make sure that all the dependencies are present on your system.
+
+Check if there are any conflicts between OpenSSL and other libraries that you're linking against. It's possible that another library is providing a different version of EVP_CTX, which is causing a conflict. You can use the ldd command to check the dependencies of all the libraries you're linking against.
+If none of these steps solve the issue, you may need to seek further assistance or contact the maintainers of the libraries for further help.
+
+======
+
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP
+
+To link against the -lcrypto and -lssh libraries and resolve undefined references to EVP, you need to ensure that your build system or compiler is configured to link against these libraries.
+
+Here's an example command-line invocation of the GCC compiler that links against both -lcrypto and -lssh:
+
+
+gcc myprogram.c -o myprogram -lcrypto -lssh
+Note that the order of the library flags is important. Libraries should be listed in the order they depend on each other, i.e., if libA depends on libB, then libB should be listed before libA.
+
+If you're using a build system like Make or CMake, you'll need to modify your build configuration to link against these libraries. In a Makefile, you might have something like:
+
+
+myprogram: myprogram.o
+    gcc myprogram.o -o myprogram -lcrypto -lssh
+In a CMakeLists.txt file, you might have something like:
+
+add_executable(myprogram myprogram.c)
+target_link_libraries(myprogram crypto ssh)
+Note that the actual names of the libraries may differ depending on your platform and distribution. You can use the pkg-config utility to find the correct names on your system. For example, you might use pkg-config like this:
+
+
+gcc myprogram.c -o myprogram `pkg-config --libs openssl libssh`
+This will automatically generate the correct -lcrypto and -lssh flags based on the output of pkg-config.
+
+
+
+
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP_ctx in libssh.so
+
+If you're getting an undefined reference to EVP_ctx in libssh.so while linking against -lcrypto and -lssh, it's possible that your version of libssh was built against a different version of OpenSSL than the one you're using to link your program.
+
+One solution is to ensure that you're using the same version of OpenSSL as libssh. You can do this by specifying the path to the correct version of OpenSSL when linking your program.
+
+For example, if your libssh library was built against OpenSSL in /usr/local/openssl, you can link your program like this:
+
+
+gcc myprogram.c -o myprogram -L/usr/local/openssl/lib -Wl,-rpath=/usr/local/openssl/lib -lssh -lcrypto
+Here, we're adding the -L flag to specify the directory where the OpenSSL library is located, and the -Wl,-rpath flag to specify the runtime path of the library. We then link against -lssh and -lcrypto as before.
+
+Alternatively, you can build libssh against the same version of OpenSSL that you're using to link your program. You can download the OpenSSL source code from the official website, build it, and then pass the path to the OpenSSL headers and libraries to the configure script when building libssh.
+
+For example:
+
+./configure --with-openssl=/path/to/openssl
+make
+sudo make install
+Here, we're specifying the path to the OpenSSL headers and libraries using the --with-openssl option. Once libssh is built, you can link your program against it as before.
+
+
+
+=====
+New chat
+
+
+P M YOGESH
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP
+
+To link against the -lcrypto and -lssh libraries and resolve undefined references to EVP, you need to ensure that your build system or compiler is configured to link against these libraries.
+
+Here's an example command-line invocation of the GCC compiler that links against both -lcrypto and -lssh:
+
+Copy code
+gcc myprogram.c -o myprogram -lcrypto -lssh
+Note that the order of the library flags is important. Libraries should be listed in the order they depend on each other, i.e., if libA depends on libB, then libB should be listed before libA.
+
+If you're using a build system like Make or CMake, you'll need to modify your build configuration to link against these libraries. In a Makefile, you might have something like:
+
+makefile
+Copy code
+myprogram: myprogram.o
+    gcc myprogram.o -o myprogram -lcrypto -lssh
+In a CMakeLists.txt file, you might have something like:
+
+scss
+Copy code
+add_executable(myprogram myprogram.c)
+target_link_libraries(myprogram crypto ssh)
+Note that the actual names of the libraries may differ depending on your platform and distribution. You can use the pkg-config utility to find the correct names on your system. For example, you might use pkg-config like this:
+
+lua
+Copy code
+gcc myprogram.c -o myprogram `pkg-config --libs openssl libssh`
+This will automatically generate the correct -lcrypto and -lssh flags based on the output of pkg-config.
+
+
+2 / 2
+
+
+
+
+P M YOGESH
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP_ctx in libssh.so
+
+If you are getting undefined reference errors related to EVP and EVP_ctx when linking against -lcrypto and -lssh, it may be because the version of libssh you are linking against was not built with the OpenSSL library.
+
+Here's what you can try to resolve the issue:
+
+Make sure that you have OpenSSL installed on your system. If not, install it using your system's package manager. For example, on Ubuntu, you can install OpenSSL by running:
+
+csharp
+Copy code
+sudo apt-get install libssl-dev
+Check if libssh was built with OpenSSL support. You can do this by running the following command:
+
+bash
+Copy code
+ldd /path/to/libssh.so
+This will show you the shared libraries that libssh depends on. Look for libcrypto and libssl in the output. If they are not present, you will need to rebuild libssh with OpenSSL support.
+
+If you need to rebuild libssh, make sure that you have the OpenSSL development headers installed on your system. On Ubuntu, you can install them by running:
+
+csharp
+Copy code
+sudo apt-get install libssl-dev
+When building libssh, make sure to configure it with OpenSSL support. You can do this by passing the --with-openssl option to the configure script. For example:
+
+python
+Copy code
+./configure --with-openssl
+After rebuilding libssh with OpenSSL support, try linking against it again. Make sure to include the -lcrypto and -lssl flags in your linker command.
+
+Copy code
+gcc -o myprogram myprogram.c -lssh -lcrypto -lssl
+If you are still getting undefined reference errors related to EVP and EVP_ctx, make sure that you are including the correct headers in your source code. You may need to add #include <openssl/evp.h> to your source file.
+
+If you are still having issues, you may need to provide more information about your build environment and the specific errors you are seeing.
+
+
+
+On RHEL 8, you can install OpenSSL and its development headers using the following commands:
+
+
+sudo yum install openssl
+sudo yum install openssl-devel
+Once you have OpenSSL installed, you can link against it by adding -lcrypto and -lssl to your linker command:
+
+
+gcc -o myprogram myprogram.c -lssh -lcrypto -lssl
+Note that the specific library names and package names may vary depending on your RHEL 8 distribution and version. You can use the yum package manager to search for available packages and libraries on your system. For example, to search for OpenSSL packages, you can run:
+
+
+sudo yum search openssl
+This will show you a list of packages related to OpenSSL that are available on your system.
+
+
+
+
+How to link -lcrypto and -lssh 
+I'm getting undefined reference to EVP_ctx in libssh.so in red hat
+
+To link against -lcrypto and -lssh and resolve undefined reference errors related to EVP_ctx in libssh.so on Red Hat, you can follow the same general steps as in my previous answer for RHEL 8:
+
+Install OpenSSL and its development headers using the yum package manager:
+
+
+sudo yum install openssl
+sudo yum install openssl-devel
+Check if libssh was built with OpenSSL support by running the following command:
+
+
+ldd /path/to/libssh.so
+If you don't see libcrypto and libssl listed in the output, libssh was not built with OpenSSL support and you will need to rebuild it.
+
+If you need to rebuild libssh, make sure that you have the OpenSSL development headers installed on your system:
+
+
+sudo yum install openssl-devel
+Configure and build libssh with OpenSSL support. You can pass the --with-openssl option to the configure script to enable OpenSSL support. For example:
+
+
+./configure --with-openssl
+make
+sudo make install
+Link against the libssh, libcrypto, and libssl libraries in your linker command:
+
+
+gcc -o myprogram myprogram.c -lssh -lcrypto -lssl
+Note that the order of the library flags is important. Libraries should be listed in the order they depend on each other.
+
+If you are still getting undefined reference errors related to EVP_ctx, make sure that you are including the correct headers in your source code. You may need to add #include <openssl/evp.h> to your source file.
+
+If you are still having issues, you may need to provide more information about your build environment and the specific errors you are seeing.
