@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+void rand_bytes(void *ptr, size_t size);
+
+int main() {
+    // Open the file to be shredded
+    int fd = open("important_document.txt", O_RDWR);
+    if (fd == -1) {
+        printf("Failed to open file\n");
+        return 1;
+    }
+
+    // Get the size of the file
+    off_t size = lseek(fd, 0, SEEK_END);
+
+    // Seek back to the beginning of the file
+    lseek(fd, 0, SEEK_SET);
+
+    // Generate a buffer of random bytes
+    unsigned char *buf = malloc(size);
+    rand_bytes(buf, size);
+
+    // Write the random bytes to the file
+    ssize_t bytes_written = write(fd, buf, size);
+    if (bytes_written != size) {
+        printf("Failed to write random bytes to file\n");
+        return 1;
+    }
+
+    // Seek back to the beginning of the file
+    lseek(fd, 0, SEEK_SET);
+
+    // Overwrite the file with random data
+    for (off_t i = 0; i < size; i++) {
+        unsigned char random_byte;
+        rand_bytes(&random_byte, 1);
+        ssize_t bytes_written = write(fd, &random_byte, 1);
+        if (bytes_written != 1) {
+            printf("Failed to overwrite file\n");
+            return 1;
+        }
+    }
+
+    // Close the file and free the buffer
+    close(fd);
+    free(buf);
+
+    printf("File has been securely shredded.\n");
+    return 0;
+}
+
+-----
+
+srand and rand_bytes are two different functions in C that are used for different purposes. Here are the main differences between the two:
+
+Purpose: srand is used to seed the pseudo-random number generator used by the rand function, while rand_bytes is used to generate a buffer of cryptographically secure random bytes.
+
+Input: srand takes an integer as input, which is used to seed the random number generator. rand_bytes, on the other hand, takes a pointer to a buffer and a size, and generates random bytes that are written to the buffer.
+
+Output: srand does not generate any output. The rand function, which uses the seed set by srand, generates a sequence of pseudo-random integers when called. rand_bytes, on the other hand, generates a sequence of cryptographically secure random bytes that are written to a buffer.
+
+Security: srand and rand generate pseudo-random numbers, which means that the sequence of numbers generated may be predictable if an attacker knows the seed used by srand. rand_bytes, on the other hand, generates cryptographically secure random bytes, which means that the sequence of bytes generated is completely unpredictable and cannot be easily reproduced.
+
+In summary, srand and rand are used for generating pseudo-random numbers, while rand_bytes is used for generating cryptographically secure random bytes. rand_bytes is generally preferred when generating random data for security purposes, such as generating cryptographic keys or securely overwriting data, while srand and rand are typically used for non-security related applications, such as simulating random events in games or simulations.
+
+
+
+_______
+
+Here are some links to the official C standard library documentation, where you can find more information about the srand and rand functions:
+
+srand: http://www.cplusplus.com/reference/cstdlib/srand/
+rand: http://www.cplusplus.com/reference/cstdlib/rand/
+Note that the documentation is not specific to any particular implementation of C, so the details may vary depending on the specific compiler or system you are using.
+
+As for the rand_bytes function, it is not part of the standard C library, so the documentation may vary depending on the library you are using. Here are some links to the documentation for two popular cryptographic libraries that provide a rand_bytes function:
+
+OpenSSL: https://www.openssl.org/docs/man1.1.1/man3/RAND_bytes.html
+libsodium: https://libsodium.gitbook.io/doc/generating_random_data
+These links should provide you with more in-depth information about these functions and how to use them.
